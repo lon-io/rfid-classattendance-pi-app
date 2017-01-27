@@ -13,17 +13,18 @@ import MFRC522
 # Timing constants
 DELAY = 0.0005
 
-GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BOARD)
 
-GPIO.setup(21, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(20, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(19, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(36, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-blue_btn = GPIO.input(21)
-green_btn = GPIO.input(16)
-red_btn = GPIO.input(20)
-black_btn = GPIO.input(19)
+blue_btn = GPIO.input(40)
+green_btn = GPIO.input(36)
+red_btn = GPIO.input(38)
+black_btn = GPIO.input(35)
+
 
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()

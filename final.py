@@ -38,18 +38,27 @@ MIFAREReader = MFRC522.MFRC522()
 # Create an object of the class Lcd
 lcd = Lcd()
 
+
 def getCourses():
+    lcd.lcd_clear()
     r = requests.get('http://192.168.43.200:3000/api/courses')
     courses = r.json()
+    last_course = courses[0]
+
+    lcd.lcd_string("", lcd.LCD_LINE_2)
 
     for index, course in enumerate(courses):
-        if index % 2 == 0:
+        if index == 0:
             lcd.lcd_string(course['code'], lcd.LCD_LINE_1)
-        else:
+        elif index == 1:
             lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
-        time.sleep(2)
+        else:
+            lcd.lcd_string(courses[index-1]['code'], lcd.LCD_LINE_1)
+            lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
+        time.sleep(1)
 
     return courses
+
 
 def readCards():
     # This loop keeps checking for chips. If one is near it will get the UID and authenticate
@@ -81,7 +90,7 @@ def readCards():
 
 def main():
     lcd.lcd_string("Welcome", lcd.LCD_LINE_1)
-    time.sleep(2)  # 3 second delay
+    time.sleep(1)  # 3 second delay
 
     lcd.lcd_string("Getting all", lcd.LCD_LINE_1)
     lcd.lcd_string("Courses ...", lcd.LCD_LINE_2)
@@ -93,7 +102,11 @@ def main():
     lcd.lcd_string("Please select a ", lcd.LCD_LINE_1)
     lcd.lcd_string("Course", lcd.LCD_LINE_2)
 
-    lcd.lcd_string(courses[0]['code'], lcd.LCD_LINE_1)
+    time.sleep(1)
+
+    current = 0
+
+    lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
     lcd.lcd_string("", lcd.LCD_LINE_2)
 
     while True:
@@ -102,21 +115,23 @@ def main():
         red_btn = GPIO.input(38)
         black_btn = GPIO.input(35)
 
-        current = 1
-
         if not blue_btn:
-            lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
-            if current < len(courses) - 1:
+            print("blue")
+            if current < len(courses) -1:
                 current += 1
+                lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
         elif not green_btn:
-            lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
+            print("green")
             if current > 0:
                 current -= 1
+                lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
         elif not red_btn:
+            print("red")
             return
         elif not black_btn:
-            lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
-            lcd.lcd_string("Selected", lcd.LCD_LINE_2)
+            print("black")
+            lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
+            lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_2)
             readCards()
             return
         time.sleep(0.2)

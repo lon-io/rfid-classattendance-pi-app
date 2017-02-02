@@ -129,3 +129,7 @@ class Lcd():
 
         for i in range(LCD_WIDTH):
             self.lcd_byte(ord(message[i]), LCD_CHR)
+
+    def lcd_clear(self):
+        self.lcd_string("", self.LCD_LINE_1)
+        self.lcd_string("", self.LCD_LINE_2)

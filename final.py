@@ -78,9 +78,11 @@ def markAttendance(course, lecture, uid):
             break
 
     if(registered):
-        lecture['attendance'].append(student['_id'])
+        attendance = lecture['attendance']
+        attendance.append(student['_id'])
+        print attendance
         r = requests.put('http://192.168.43.200:3000/api/lecture/attendance/' + lecture['_id'],
-                         data=lecture)
+                         data=attendance)
         lecture = r.json()
 
         lcd.lcd_string("Marked:", lcd.LCD_LINE_1)
@@ -89,7 +91,7 @@ def markAttendance(course, lecture, uid):
         return lecture, student
 
     else:
-        lcd.lcd_string(student['matric_no'] + 'not', lcd.LCD_LINE_1)
+        lcd.lcd_string(student['matric_no'] + ' not', lcd.LCD_LINE_1)
         lcd.lcd_string('registered', lcd.LCD_LINE_2)
 
         return lecture, student

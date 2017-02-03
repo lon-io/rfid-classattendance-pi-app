@@ -4,6 +4,7 @@
 # import
 import time
 import signal
+from datetime import datetime
 
 import RPi.GPIO as GPIO
 import requests
@@ -60,22 +61,51 @@ def getCourses():
     return courses
 
 
-def readCards():
+def markAttendance(course, lecture, uid):
+    # r = requests.get('http://192.168.43.200:3000/api/courses')
+    # courses = r.json()
+    pass
+
+
+def readCards(course, lecture):
+    lcd.lcd_string("You may now ", lcd.LCD_LINE_1)
+    lcd.lcd_string("swipe cards...", lcd.LCD_LINE_2)
+
+    time.sleep(1)
+
+    lcd.lcd_clear()
+
+    current = 0
+
     # This loop keeps checking for chips. If one is near it will get the UID and authenticate
     while True:
+
+        students = []
 
         blue_btn = GPIO.input(40)
         green_btn = GPIO.input(36)
         red_btn = GPIO.input(38)
         black_btn = GPIO.input(35)
 
+        if not blue_btn:
+            if current < len(students) -1:
+                current += 1
+                #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
+        elif not green_btn:
+            if current > 0:
+                current -= 1
+                #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
+        elif not red_btn:
+            return
+        elif not black_btn:
+            return students[current]
 
         # Scan for cards
         (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
 
         # If a card is found
         if status == MIFAREReader.MI_OK:
-            print "Card detected"
+            lcd.lcd_string("Card detected:", lcd.LCD_LINE_1)
 
         # Get the UID of the card
         (status,uid) = MIFAREReader.MFRC522_Anticoll()
@@ -83,9 +113,67 @@ def readCards():
         # If we have the UID, continue
         if status == MIFAREReader.MI_OK:
 
+            uid_ = str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
+
             # Print UID
-            lcd.lcd_string(str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3]), lcd.LCD_LINE_1)
-            lcd.lcd_string("", lcd.LCD_LINE_2)
+            lcd.lcd_string(uid_, lcd.LCD_LINE_2)
+
+            markAttendance(course, lecture, uid_)
+
+        else:
+            lcd.lcd_clear()
+            lcd.lcd_string("Error occurred", lcd.LCD_LINE_1)
+
+            return
+
+
+def selectCourse(courses):
+    current = 0
+
+    lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
+    lcd.lcd_string("", lcd.LCD_LINE_2)
+
+    while True:
+        blue_btn = GPIO.input(40)
+        green_btn = GPIO.input(36)
+        red_btn = GPIO.input(38)
+        black_btn = GPIO.input(35)
+
+        if not blue_btn:
+            print("Next")
+            if current < len(courses) -1:
+                current += 1
+                lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
+        elif not green_btn:
+            print("Previous")
+            if current > 0:
+                current -= 1
+                lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
+        elif not red_btn:
+            print("Back")
+            return
+        elif not black_btn:
+            print("Selected")
+            return courses[current]
+        time.sleep(0.2)
+
+
+def createLecture(course):
+    r = requests.post('http://192.168.43.200:3000/api/lecture', data = {
+        'course': course['_id'],
+        'topic': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'about': {
+            'page': {
+                'raw': '',
+                'html': ''
+            },
+            'bio': ''
+        },
+        'attendance': [],
+        'schedule': [],
+    })
+    lecture = r.json()
+    return lecture
 
 
 def main():
@@ -104,37 +192,19 @@ def main():
 
     time.sleep(1)
 
-    current = 0
+    course = selectCourse(courses)
 
-    lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
-    lcd.lcd_string("", lcd.LCD_LINE_2)
+    lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
+    lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
 
-    while True:
-        blue_btn = GPIO.input(40)
-        green_btn = GPIO.input(36)
-        red_btn = GPIO.input(38)
-        black_btn = GPIO.input(35)
+    time.sleep(0.5)
 
-        if not blue_btn:
-            print("blue")
-            if current < len(courses) -1:
-                current += 1
-                lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
-        elif not green_btn:
-            print("green")
-            if current > 0:
-                current -= 1
-                lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
-        elif not red_btn:
-            print("red")
-            return
-        elif not black_btn:
-            print("black")
-            lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
-            lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_2)
-            readCards()
-            return
-        time.sleep(0.2)
+    lecture = createLecture(course)
+
+    lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
+    lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
+
+    readCards(course, lecture)
 
 
 if __name__ == '__main__':

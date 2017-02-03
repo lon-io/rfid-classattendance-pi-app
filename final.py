@@ -62,9 +62,13 @@ def getCourses():
 
 
 def markAttendance(course, lecture, uid):
-    # r = requests.get('http://192.168.43.200:3000/api/courses')
-    # courses = r.json()
-    pass
+    attendance = lecture['attendance']
+    attendance.append(uid)
+    r = requests.put('http://192.168.43.200:3000/api/lecture/attendance/' + lecture['_id'] + '/' + uid, data={
+        'attendance' : attendance
+    })
+    lecture = r.json()
+    return lecture
 
 
 def readCards(course, lecture):
@@ -118,13 +122,13 @@ def readCards(course, lecture):
             # Print UID
             lcd.lcd_string(uid_, lcd.LCD_LINE_2)
 
-            markAttendance(course, lecture, uid_)
+            lecture = markAttendance(course, lecture, uid_)
 
-        else:
-            lcd.lcd_clear()
-            lcd.lcd_string("Error occurred", lcd.LCD_LINE_1)
+            lcd.lcd_string("Marked:", lcd.LCD_LINE_1)
+            lcd.lcd_string(lecture['attendance'][-1]['matric_no'], lcd.LCD_LINE_2)
 
-            return
+            students.append(lecture['attendance'][-1]['matric_no'])
+
 
 
 def selectCourse(courses):
@@ -203,6 +207,8 @@ def main():
 
     lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
     lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
+
+    time.sleep(0.5)
 
     readCards(course, lecture)
 

@@ -44,7 +44,6 @@ def getCourses():
     lcd.lcd_clear()
     r = requests.get('http://192.168.43.200:3000/api/courses')
     courses = r.json()
-    last_course = courses[0]
 
     lcd.lcd_string("", lcd.LCD_LINE_2)
 
@@ -61,14 +60,39 @@ def getCourses():
     return courses
 
 
+def getStudent(uid):
+    r = requests.get('http://192.168.43.200:3000/api/student_by_uid/' + uid)
+    student = r.json()
+    return student
+
+
 def markAttendance(course, lecture, uid):
-    attendance = lecture['attendance']
-    attendance.append(uid)
-    r = requests.put('http://192.168.43.200:3000/api/lecture/attendance/' + lecture['_id'] + '/' + uid, data={
-        'attendance' : attendance
-    })
-    lecture = r.json()
-    return lecture
+
+    student = getStudent(uid)
+
+    registered = False
+
+    for index, course_ in enumerate(student['courses']):
+        if course['_id'] == course_['_id']:
+            registered = True
+            break
+
+    if(registered):
+        lecture['attendance'].append(student['_id'])
+        r = requests.put('http://192.168.43.200:3000/api/lecture/attendance/' + lecture['_id'],
+                         data=lecture)
+        lecture = r.json()
+
+        lcd.lcd_string("Marked:", lcd.LCD_LINE_1)
+        lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_2)
+
+        return lecture
+
+    else:
+        lcd.lcd_string(student['matric_no'] + 'not', lcd.LCD_LINE_1)
+        lcd.lcd_string('registered', lcd.LCD_LINE_2)
+
+        return lecture
 
 
 def readCards(course, lecture):
@@ -109,6 +133,7 @@ def readCards(course, lecture):
 
         # If a card is found
         if status == MIFAREReader.MI_OK:
+            lcd.lcd_clear()
             lcd.lcd_string("Card detected:", lcd.LCD_LINE_1)
 
         # Get the UID of the card
@@ -123,9 +148,6 @@ def readCards(course, lecture):
             lcd.lcd_string(uid_, lcd.LCD_LINE_2)
 
             lecture = markAttendance(course, lecture, uid_)
-
-            lcd.lcd_string("Marked:", lcd.LCD_LINE_1)
-            lcd.lcd_string(lecture['attendance'][-1]['matric_no'], lcd.LCD_LINE_2)
 
             students.append(lecture['attendance'][-1]['matric_no'])
 

@@ -1,5 +1,9 @@
 import requests
 
-r = requests.get('http://192.168.43.200:3000/api/courses')
+BASE_URL = 'http://192.168.20.124:3000/api/'
 
-print(r.json())
+def get():
+    r = requests.get(BASE_URL + 'courses')
+    print(r.json())
+
+get()

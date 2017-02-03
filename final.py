@@ -10,6 +10,7 @@ import RPi.GPIO as GPIO
 import requests
 from lcd import Lcd
 import MFRC522
+import json
 
 # Timing constants
 DELAY = 0.0005
@@ -81,10 +82,13 @@ def markAttendance(course, lecture, uid):
 
     if(registered):
         attendance = lecture['attendance']
-        attendance.append(student['_id'])
         print attendance
+        attendance.append(student['_id'])
+        lecture['attendance'] = attendance
+        print lecture['attendance']
+        data = lecture
         r = requests.put(BASE_URL + 'lecture/attendance/' + lecture['_id'],
-                         data=attendance)
+                         json=lecture)
         lecture = r.json()
 
         lcd.lcd_string("Marked:", lcd.LCD_LINE_1)

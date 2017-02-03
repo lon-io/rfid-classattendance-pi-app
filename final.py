@@ -86,13 +86,13 @@ def markAttendance(course, lecture, uid):
         lcd.lcd_string("Marked:", lcd.LCD_LINE_1)
         lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_2)
 
-        return lecture
+        return lecture, student
 
     else:
         lcd.lcd_string(student['matric_no'] + 'not', lcd.LCD_LINE_1)
         lcd.lcd_string('registered', lcd.LCD_LINE_2)
 
-        return lecture
+        return lecture, student
 
 
 def readCards(course, lecture):
@@ -147,9 +147,9 @@ def readCards(course, lecture):
             # Print UID
             lcd.lcd_string(uid_, lcd.LCD_LINE_2)
 
-            lecture = markAttendance(course, lecture, uid_)
+            (lecture, student) = markAttendance(course, lecture, uid_)
 
-            students.append(lecture['attendance'][-1]['matric_no'])
+            students.append(student['matric_no'])
 
 
 

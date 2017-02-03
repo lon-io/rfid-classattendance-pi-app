@@ -21,6 +21,8 @@ GPIO.setup(36, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+BASE_URL = 'http://192.168.43.200:3000/api/'
+
 
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal, frame):
@@ -42,7 +44,7 @@ lcd = Lcd()
 
 def getCourses():
     lcd.lcd_clear()
-    r = requests.get('http://192.168.43.200:3000/api/courses')
+    r = requests.get(BASE_URL + 'courses')
     courses = r.json()
 
     lcd.lcd_string("", lcd.LCD_LINE_2)
@@ -61,7 +63,7 @@ def getCourses():
 
 
 def getStudent(uid):
-    r = requests.get('http://192.168.43.200:3000/api/student_by_uid/' + uid)
+    r = requests.get(BASE_URL + 'student_by_uid/' + uid)
     student = r.json()
     return student
 
@@ -81,7 +83,7 @@ def markAttendance(course, lecture, uid):
         attendance = lecture['attendance']
         attendance.append(student['_id'])
         print attendance
-        r = requests.put('http://192.168.43.200:3000/api/lecture/attendance/' + lecture['_id'],
+        r = requests.put(BASE_URL + 'lecture/attendance/' + lecture['_id'],
                          data=attendance)
         lecture = r.json()
 
@@ -187,7 +189,7 @@ def selectCourse(courses):
 
 
 def createLecture(course):
-    r = requests.post('http://192.168.43.200:3000/api/lecture', data = {
+    r = requests.post(BASE_URL + 'lecture', data = {
         'course': course['_id'],
         'topic': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'about': {

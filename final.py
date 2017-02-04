@@ -80,19 +80,21 @@ def markAttendance(course, lecture, uid):
             registered = True
             break
 
-    if(registered):
-        attendance = lecture['attendance']
-        print attendance
-        attendance.append(student['_id'])
-        lecture['attendance'] = attendance
-        print lecture['attendance']
-        data = lecture
-        r = requests.put(BASE_URL + 'lecture/attendance/' + lecture['_id'],
+    if registered:
+        attendance_ = lecture['attendance']
+        lecture['attendance'].append(student['_id'])
+        r = requests.put(BASE_URL + 'lecture/attendance/' + lecture['_id'] + '/' + student['_id'],
                          json=lecture)
-        lecture = r.json()
+        response = r.json()
 
-        lcd.lcd_string("Marked:", lcd.LCD_LINE_1)
-        lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_2)
+        if response['error']:
+            lecture['attendance'] = attendance_
+            lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_1)
+            lcd.lcd_string("Already Marked:", lcd.LCD_LINE_2)
+        else:
+            lecture = response
+            lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_1)
+            lcd.lcd_string("Marked:", lcd.LCD_LINE_2)
 
         return lecture, student
 

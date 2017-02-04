@@ -87,7 +87,7 @@ def markAttendance(course, lecture, uid):
                          json=lecture)
         response = r.json()
 
-        if response['error']:
+        if 'error' in response and response['error']:
             lecture['attendance'] = attendance_
             lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_1)
             lcd.lcd_string("Already Marked:", lcd.LCD_LINE_2)

@@ -71,7 +71,14 @@ def getStudent(uid):
 
 def markAttendance(course, lecture, uid):
 
-    student = getStudent(uid)
+    response = getStudent(uid)
+
+    if 'error' in response and response['error']:
+        lcd.lcd_string('No user with ID:', lcd.LCD_LINE_1)
+        lcd.lcd_string(uid, lcd.LCD_LINE_2)
+        return lecture, False
+    else:
+        student = response
 
     registered = False
 
@@ -90,11 +97,11 @@ def markAttendance(course, lecture, uid):
         if 'error' in response and response['error']:
             lecture['attendance'] = attendance_
             lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_1)
-            lcd.lcd_string("Already Marked:", lcd.LCD_LINE_2)
+            lcd.lcd_string("Already Marked", lcd.LCD_LINE_2)
         else:
             lecture = response
             lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_1)
-            lcd.lcd_string("Marked:", lcd.LCD_LINE_2)
+            lcd.lcd_string("Marked", lcd.LCD_LINE_2)
 
         return lecture, student
 
@@ -159,7 +166,8 @@ def readCards(course, lecture):
 
             (lecture, student) = markAttendance(course, lecture, uid_)
 
-            students.append(student['matric_no'])
+            if student != False:
+                students.append(student['matric_no'])
 
 
 

@@ -20,7 +20,14 @@ for i in range(1):
 
 try:
         while(True):
-            ### code ###
+            for j in range(4):
+                GPIO.output(COL_PINS[j], 0)
+
+                for i in range(4):
+                    if GPIO.input(ROW_PINS[i] == 0):
+                        print KEYPAD[i][j]
+                        while(GPIO.input(ROW_PINS[i]) == 0):
+                            pass
 
 except KeyboardInterrupt:
         GPIO.cleanup();

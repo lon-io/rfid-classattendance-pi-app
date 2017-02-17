@@ -1,5 +1,6 @@
 
 import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
 
 KEYPAD = [
         ["1","2","3","A"],

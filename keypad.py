@@ -30,5 +30,6 @@ try:
                         while(GPIO.input(ROW_PINS[i]) == 0):
                             pass
 
+                GPIO.output(COL_PINS[j], 1)
 except KeyboardInterrupt:
-        GPIO.cleanup();
+        GPIO.cleanup()

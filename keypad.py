@@ -16,7 +16,7 @@ for j in range(4):
         GPIO.setup(COL_PINS[j], GPIO.OUT)
         GPIO.output(COL_PINS[j], 1)
 
-for i in range(1):
+for i in range(4):
         GPIO.setup(ROW_PINS[i], GPIO.IN, pull_up_down = GPIO.PUD_UP)
 
 try:

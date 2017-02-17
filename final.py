@@ -17,10 +17,20 @@ DELAY = 0.0005
 
 GPIO.setmode(GPIO.BOARD)
 
-GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(36, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+KEYPAD = [
+        ["1","2","3","A"],
+        ["4","5","6","B"],
+        ["7","8","9","C"],
+        ["*","0","#","D"]
+]
+
+COL_PINS = [0,5,6,13] # BCM numbering
+ROW_PINS = [19,20,16,21] # BCM numbering
+
+# GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.setup(36, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 BASE_URL = 'http://192.168.43.200:3000/api/'
 
@@ -127,23 +137,23 @@ def readCards(course, lecture):
 
         students = []
 
-        blue_btn = GPIO.input(40)
-        green_btn = GPIO.input(36)
-        red_btn = GPIO.input(38)
-        black_btn = GPIO.input(35)
+        # blue_btn = GPIO.input(40)
+        # green_btn = GPIO.input(36)
+        # red_btn = GPIO.input(38)
+        # black_btn = GPIO.input(35)
 
-        if not blue_btn:
-            if current < len(students) -1:
-                current += 1
-                #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
-        elif not green_btn:
-            if current > 0:
-                current -= 1
-                #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
-        elif not red_btn:
-            return
-        elif not black_btn:
-            return students[current]
+        # if not blue_btn:
+        #     if current < len(students) -1:
+        #         current += 1
+        #         #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
+        # elif not green_btn:
+        #     if current > 0:
+        #         current -= 1
+        #         #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
+        # elif not red_btn:
+        #     return
+        # elif not black_btn:
+        #     return students[current]
 
         # Scan for cards
         (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
@@ -178,27 +188,27 @@ def selectCourse(courses):
     lcd.lcd_string("", lcd.LCD_LINE_2)
 
     while True:
-        blue_btn = GPIO.input(40)
-        green_btn = GPIO.input(36)
-        red_btn = GPIO.input(38)
-        black_btn = GPIO.input(35)
-
-        if not blue_btn:
-            print("Next")
-            if current < len(courses) -1:
-                current += 1
-                lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
-        elif not green_btn:
-            print("Previous")
-            if current > 0:
-                current -= 1
-                lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
-        elif not red_btn:
-            print("Back")
-            return
-        elif not black_btn:
-            print("Selected")
-            return courses[current]
+        # blue_btn = GPIO.input(40)
+        # green_btn = GPIO.input(36)
+        # red_btn = GPIO.input(38)
+        # black_btn = GPIO.input(35)
+        #
+        # if not blue_btn:
+        #     print("Next")
+        #     if current < len(courses) -1:
+        #         current += 1
+        #         lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
+        # elif not green_btn:
+        #     print("Previous")
+        #     if current > 0:
+        #         current -= 1
+        #         lcd.lcd_string(courses[current]['code'], lcd.LCD_LINE_1)
+        # elif not red_btn:
+        #     print("Back")
+        #     return
+        # elif not black_btn:
+        #     print("Selected")
+        #     return courses[current]
         time.sleep(0.2)
 
 

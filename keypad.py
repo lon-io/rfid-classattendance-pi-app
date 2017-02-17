@@ -1,35 +1,51 @@
-
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
+from pad4pi import rpi_gpio
+import time
 
 KEYPAD = [
-        ["1","2","3","A"],
-        ["4","5","6","B"],
-        ["7","8","9","C"],
-        ["*","0","#","D"]
+        ["1", "2", "3", "A"],
+        ["4", "5", "6", "B"],
+        ["7", "8", "9", "C"],
+        ["*", "0", "#", "D"]
 ]
 
-COL_PINS = [0,5,6,13] # BCM numbering
-ROW_PINS = [19,20,16,21] # BCM numbering
+COL_PINS = [5,6,13,19] # BCM numbering
+ROW_PINS = [1,20,16,21] # BCM numbering
 
-for j in range(4):
-        GPIO.setup(COL_PINS[j], GPIO.OUT)
-        GPIO.output(COL_PINS[j], 1)
+class Keypad:
 
-for i in range(4):
-        GPIO.setup(ROW_PINS[i], GPIO.IN, pull_up_down = GPIO.PUD_UP)
+        is_ok_clicked = False
+        is_back_clicked = False
+        current_str = ""
+        last_char = ""
 
-try:
-        while(True):
-            for j in range(4):
-                GPIO.output(COL_PINS[j], 0)
+        factory = rpi_gpio.KeypadFactory()
 
-                for i in range(4):
-                    if GPIO.input(ROW_PINS[i] == 0):
-                        print KEYPAD[i][j]
-                        while(GPIO.input(ROW_PINS[i]) == 0):
-                            pass
+        # Try factory.create_4_by_3_keypad
+        # and factory.create_4_by_4_keypad for reasonable defaults
+        keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS, col_pins=COL_PINS)
 
-                GPIO.output(COL_PINS[j], 1)
-except KeyboardInterrupt:
-        GPIO.cleanup()
+        def __init__(self):
+
+                self.keypad.registerKeyPressHandler(self.printKey)
+
+
+        def printKey(self, key):
+                self.last_char = key
+                if key == KEYPAD[3]:
+                        self.is_ok_clicked = True
+                elif key == KEYPAD[7]:
+                        self.is_back_clicked = True
+                else:
+                        self.is_ok_clicked = False
+                        self.is_back_clicked = False
+                        self.current_str += key
+
+
+# try:
+#         print("Press buttons on your keypad. Ctrl+C to exit.")
+#         while True:
+#                 time.sleep(1)
+# except KeyboardInterrupt:
+#         print("Goodbye")
+# finally:
+#         keypad.cleanup()

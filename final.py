@@ -10,22 +10,15 @@ import RPi.GPIO as GPIO
 import requests
 from lcd import Lcd
 import MFRC522
+from keypad import Keypad
 import json
+
+from pad4pi import rpi_gpio;
 
 # Timing constants
 DELAY = 0.0005
 
-GPIO.setmode(GPIO.BOARD)
-
-KEYPAD = [
-        ["1","2","3","A"],
-        ["4","5","6","B"],
-        ["7","8","9","C"],
-        ["*","0","#","D"]
-]
-
-COL_PINS = [0,5,6,13] # BCM numbering
-ROW_PINS = [19,20,16,21] # BCM numbering
+GPIO.setmode(GPIO.BCM)
 
 # GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # GPIO.setup(36, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -33,7 +26,6 @@ ROW_PINS = [19,20,16,21] # BCM numbering
 # GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 BASE_URL = 'http://192.168.43.200:3000/api/'
-
 
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal, frame):
@@ -52,6 +44,8 @@ MIFAREReader = MFRC522.MFRC522()
 # Create an object of the class Lcd
 lcd = Lcd()
 
+### KEYPAD ###
+keypad = Keypad()
 
 def getCourses():
     lcd.lcd_clear()
@@ -230,37 +224,43 @@ def createLecture(course):
     return lecture
 
 
+def readKeypad():
+    print keypad.current_str
+
+
 def main():
     lcd.lcd_string("Welcome", lcd.LCD_LINE_1)
     time.sleep(1)  # 3 second delay
 
-    lcd.lcd_string("Getting all", lcd.LCD_LINE_1)
-    lcd.lcd_string("Courses ...", lcd.LCD_LINE_2)
+    lcd.lcd_string("Please enter a", lcd.LCD_LINE_1)
+    lcd.lcd_string("Course code", lcd.LCD_LINE_2)
 
     time.sleep(1)
 
-    courses = getCourses()
+    readKeypad()
 
-    lcd.lcd_string("Please select a ", lcd.LCD_LINE_1)
-    lcd.lcd_string("Course", lcd.LCD_LINE_2)
-
-    time.sleep(1)
-
-    course = selectCourse(courses)
-
-    lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
-    lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
-
-    time.sleep(0.5)
-
-    lecture = createLecture(course)
-
-    lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
-    lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
-
-    time.sleep(0.5)
-
-    readCards(course, lecture)
+    # courses = getCourses()
+    #
+    # lcd.lcd_string("Please select a ", lcd.LCD_LINE_1)
+    # lcd.lcd_string("Course", lcd.LCD_LINE_2)
+    #
+    # time.sleep(1)
+    #
+    # course = selectCourse(courses)
+    #
+    # lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
+    # lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
+    #
+    # time.sleep(0.5)
+    #
+    # lecture = createLecture(course)
+    #
+    # lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
+    # lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
+    #
+    # time.sleep(0.5)
+    #
+    # readCards(course, lecture)
 
 
 if __name__ == '__main__':

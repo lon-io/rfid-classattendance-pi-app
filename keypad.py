@@ -15,6 +15,7 @@ class Keypad:
 
         is_ok_clicked = False
         is_back_clicked = False
+        is_delete_clicked = False
         current_str = ""
         last_char = ""
 
@@ -33,11 +34,14 @@ class Keypad:
                 self.last_char = key
                 if key == 'A':
                         self.is_ok_clicked = True
-                elif key == 'B  ':
+                elif key == 'B':
                         self.is_back_clicked = True
+                elif key == 'C':
+                        self.is_delete_clicked = True
                 else:
                         self.is_ok_clicked = False
                         self.is_back_clicked = False
+                        self.is_delete_clicked = False
                         self.current_str += key
 
 

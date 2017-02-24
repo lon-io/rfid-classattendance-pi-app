@@ -44,6 +44,8 @@ MIFAREReader = MFRC522.MFRC522()
 # Create an object of the class Lcd
 lcd = Lcd()
 
+showKeyPad = False
+
 ### KEYPAD ###
 keypad = Keypad()
 
@@ -233,15 +235,19 @@ def readKeypad():
             print keypad.current_str
         last_str = keypad.current_str
 
+        if showKeyPad:
+            lcd.lcd_string(last_str, lcd.LCD_LINE_1)
+
 
 def main():
     lcd.lcd_string("Welcome", lcd.LCD_LINE_1)
     time.sleep(1)  # 3 second delay
 
-    lcd.lcd_string("Please enter a", lcd.LCD_LINE_1)
-    lcd.lcd_string("Course code", lcd.LCD_LINE_2)
+    lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
+    lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
 
     time.sleep(1)
+
 
     readKeypad()
 

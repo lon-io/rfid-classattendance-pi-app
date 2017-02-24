@@ -18,7 +18,7 @@ from pad4pi import rpi_gpio;
 # Timing constants
 DELAY = 0.0005
 
-GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BOARD)
 
 # GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # GPIO.setup(36, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -225,7 +225,13 @@ def createLecture(course):
 
 
 def readKeypad():
-    print keypad.current_str
+    last_str = keypad.current_str
+    while True:
+        if keypad.is_ok_clicked:
+            return
+        elif last_str != keypad.current_str:
+            print keypad.current_str
+        last_str = keypad.current_str
 
 
 def main():

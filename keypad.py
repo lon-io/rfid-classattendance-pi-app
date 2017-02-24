@@ -8,8 +8,8 @@ KEYPAD = [
         ["*", "0", "#", "D"]
 ]
 
-COL_PINS = [5,6,13,19] # BCM numbering
-ROW_PINS = [1,20,16,21] # BCM numbering
+COL_PINS = [29,31,33,35] # BCM numbering
+ROW_PINS = [15,8,10,40] # BCM numbering
 
 class Keypad:
 
@@ -31,9 +31,9 @@ class Keypad:
 
         def printKey(self, key):
                 self.last_char = key
-                if key == KEYPAD[3]:
+                if key == 'A':
                         self.is_ok_clicked = True
-                elif key == KEYPAD[7]:
+                elif key == 'B  ':
                         self.is_back_clicked = True
                 else:
                         self.is_ok_clicked = False

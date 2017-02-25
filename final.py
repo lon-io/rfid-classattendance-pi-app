@@ -9,7 +9,7 @@ from datetime import datetime
 import RPi.GPIO as GPIO
 import requests
 from lcd import Lcd
-import MFRC522
+from MFRC522 import MFRC522
 from keypad import Keypad
 import json
 

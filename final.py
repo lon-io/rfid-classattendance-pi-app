@@ -234,8 +234,8 @@ def readKeypad():
             print keypad.current_str
         last_str = keypad.current_str
 
-        if showKeyPad:
-            lcd.lcd_string(last_str, lcd.LCD_LINE_1)
+        #if showKeyPad:
+        lcd.lcd_string(last_str, lcd.LCD_LINE_1)
 
 
 def main():

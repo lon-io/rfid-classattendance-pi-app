@@ -247,7 +247,7 @@ def main():
 
     time.sleep(1)
 
-
+    showKeyPad = True
     readKeypad()
 
     # courses = getCourses()

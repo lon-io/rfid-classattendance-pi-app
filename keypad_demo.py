@@ -1,6 +1,7 @@
 
 import RPi.GPIO as GPIO
 from keypad import Keypad
+import time
 
 GPIO.setmode(GPIO.BOARD)
 
@@ -16,6 +17,7 @@ def readKeypad():
             print keypad.current_str
         last_str = keypad.current_str
         print last_str
+        time.sleep(0.5)
 
 def main():
     readKeypad()

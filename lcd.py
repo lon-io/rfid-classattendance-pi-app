@@ -50,7 +50,7 @@ class Lcd():
         # Main program block
 
         GPIO.setwarnings(False)
-        GPIO.setmode(GPIO.BCM)  # Use BCM GPIO numbers
+        GPIO.setmode(GPIO.BOARD)  # Use BOARD GPIO numbers
         GPIO.setup(LCD_E, GPIO.OUT)  # E
         GPIO.setup(LCD_RS, GPIO.OUT)  # RS
         GPIO.setup(LCD_D4, GPIO.OUT)  # DB4

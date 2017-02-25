@@ -13,7 +13,6 @@ from MFRC522 import MFRC522
 from keypad import Keypad
 import json
 
-from pad4pi import rpi_gpio
 
 # Timing constants
 DELAY = 0.0005

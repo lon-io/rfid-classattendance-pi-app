@@ -8,8 +8,8 @@ KEYPAD = [
         ["*", "0", "#", "D"]
 ]
 
-COL_PINS = [29,31,33,35] # BCM numbering
-ROW_PINS = [15,8,10,40] # BCM numbering
+COL_PINS = [29,31,33,35] # BOARD numbering
+ROW_PINS = [15,8,10,40] # BOARD numbering
 
 class Keypad:
 

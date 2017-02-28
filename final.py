@@ -226,25 +226,32 @@ def createLecture(course):
 
 
 def readKeypad():
-    last_str = keypad.current_str
+    last_str = ""
     while True:
-        if keypad.is_ok_clicked:
-            return
-        elif last_str != keypad.current_str:
-            print keypad.current_str
         last_str = keypad.current_str
-
-        #if showKeyPad:
-        # Todo check that the string contains only integers
-        lcd.lcd_string(last_str, lcd.LCD_LINE_1)
+        if keypad.is_ok_clicked:
+            return last_str
+        elif keypad.is_back_clicked:
+            return False
+        elif last_str != keypad.current_str:
+            # if showKeyPad:
+            # Todo check that the string contains only integers
+            lcd.lcd_string(last_str, lcd.LCD_LINE_1)
 
 
 def getCourse(current_str):
     lcd.lcd_clear()
     r = requests.get(BASE_URL + 'coursecode/' + current_str)
-    course = r.json()
 
-    lcd.lcd_string("", lcd.LCD_LINE_2)
+    response = r.json()
+
+    if 'error' in response and response['error']:
+        lcd.lcd_string('No course with ', lcd.LCD_LINE_1)
+        lcd.lcd_string('code: EEE' + current_str, lcd.LCD_LINE_2)
+        time.sleep(1)
+        return False
+    else:
+        course = response
 
     return course
 
@@ -259,23 +266,36 @@ def main():
     time.sleep(1)
 
     showKeyPad = True
-    readKeypad()
+    course_code = readKeypad()
+    if not course_code:
+        lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
+        lcd.lcd_string("", lcd.LCD_LINE_2)
+    else:
+        course = getCourse(course_code)
 
-    course = getCourse(keypad.current_str)
+        while not course:
+            showKeyPad = True
+            course_code = readKeypad()
+            if not course_code:
+                lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
+                lcd.lcd_string("", lcd.LCD_LINE_2)
+                return
+            course = getCourse(keypad.current_str)
 
-    lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
-    lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
+        lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
+        lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
 
-    time.sleep(0.5)
+        time.sleep(0.5)
 
-    lecture = createLecture(course)
+        lecture = createLecture(course)
 
-    lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
-    lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
+        lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
+        lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
 
-    time.sleep(0.5)
+        time.sleep(0.5)
 
-    readCards(course, lecture)
+        readCards(course, lecture)
+
 
     # courses = getCourses()
     #

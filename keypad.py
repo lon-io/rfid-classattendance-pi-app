@@ -39,7 +39,7 @@ class Keypad:
                         self.is_back_clicked = True
                 elif key == 'C':
                         self.is_delete_clicked = True
-                        if len(self.current_str) is not 0:
+                        if len(self.current_str) != 0:
                                 self.current_str = self.current_str[:-1]
                 else:
                         self.is_ok_clicked = False

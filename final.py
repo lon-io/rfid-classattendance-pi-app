@@ -43,8 +43,6 @@ MIFAREReader = MFRC522.MFRC522()
 # Create an object of the class Lcd
 lcd = Lcd()
 
-showKeyPad = False
-
 ### KEYPAD ###
 keypad = Keypad()
 
@@ -232,6 +230,7 @@ def resetKeypad():
 
 
 def readKeypad():
+    keypad.current_str = ""
     last_str = ""
     while True:
         if keypad.is_ok_clicked:
@@ -242,7 +241,7 @@ def readKeypad():
             return False
         elif keypad.is_delete_clicked:
             resetKeypad()
-        elif last_str is not keypad.current_str:
+        elif last_str != keypad.current_str:
             last_str = keypad.current_str
             if keypad.should_show:
                 # Todo: Should  check that the string contains only integers
@@ -279,7 +278,7 @@ def main():
     lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
     lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
 
-    showKeyPad = True
+    keypad.should_show = True
     course_code = readKeypad()
     if not course_code:
         lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
@@ -288,7 +287,6 @@ def main():
         course = getCourse(course_code)
 
         while not course:
-            showKeyPad = True
             course_code = readKeypad()
             if not course_code:
                 lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)

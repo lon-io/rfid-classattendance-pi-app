@@ -13,6 +13,7 @@ ROW_PINS = [15,8,10,40] # BOARD numbering
 
 class Keypad:
 
+        should_show = False
         is_ok_clicked = False
         is_back_clicked = False
         is_delete_clicked = False
@@ -38,7 +39,8 @@ class Keypad:
                         self.is_back_clicked = True
                 elif key == 'C':
                         self.is_delete_clicked = True
-                        self.current_str = self.current_str[0, len(self.current_str) - 2]
+                        if len(self.current_str) is not 0:
+                                self.current_str = self.current_str[:-1]
                 else:
                         self.is_ok_clicked = False
                         self.is_back_clicked = False

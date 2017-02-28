@@ -225,18 +225,29 @@ def createLecture(course):
     return lecture
 
 
+def resetKeypad():
+    keypad.is_back_clicked = False
+    keypad.is_delete_clicked = False
+    keypad.is_ok_clicked = False
+
+
 def readKeypad():
     last_str = ""
     while True:
-        last_str = keypad.current_str
         if keypad.is_ok_clicked:
+            resetKeypad()
             return last_str
         elif keypad.is_back_clicked:
+            resetKeypad()
             return False
-        elif last_str != keypad.current_str:
-            # if showKeyPad:
-            # Todo check that the string contains only integers
-            lcd.lcd_string(last_str, lcd.LCD_LINE_1)
+        elif keypad.is_delete_clicked:
+            resetKeypad()
+        elif last_str is not keypad.current_str:
+            last_str = keypad.current_str
+            if keypad.should_show:
+                # Todo: Should  check that the string contains only integers
+                clearLcd()
+                lcd.lcd_string(last_str, lcd.LCD_LINE_1)
 
 
 def getCourse(current_str):
@@ -256,14 +267,17 @@ def getCourse(current_str):
     return course
 
 
+def clearLcd():
+    lcd.lcd_string("", lcd.LCD_LINE_1)
+    lcd.lcd_string("", lcd.LCD_LINE_2)
+
+
 def main():
     lcd.lcd_string("Welcome", lcd.LCD_LINE_1)
     time.sleep(1)  # 3 second delay
 
     lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
     lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
-
-    time.sleep(1)
 
     showKeyPad = True
     course_code = readKeypad()
@@ -285,7 +299,7 @@ def main():
         lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
         lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
 
-        time.sleep(0.5)
+        time.sleep(1.0)
 
         lecture = createLecture(course)
 

@@ -235,7 +235,18 @@ def readKeypad():
         last_str = keypad.current_str
 
         #if showKeyPad:
+        # Todo check that the string contains only integers
         lcd.lcd_string(last_str, lcd.LCD_LINE_1)
+
+
+def getCourse(current_str):
+    lcd.lcd_clear()
+    r = requests.get(BASE_URL + 'coursecode/' + current_str)
+    course = r.json()
+
+    lcd.lcd_string("", lcd.LCD_LINE_2)
+
+    return course
 
 
 def main():
@@ -249,6 +260,22 @@ def main():
 
     showKeyPad = True
     readKeypad()
+
+    course = getCourse(keypad.current_str)
+
+    lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
+    lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
+
+    time.sleep(0.5)
+
+    lecture = createLecture(course)
+
+    lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
+    lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
+
+    time.sleep(0.5)
+
+    readCards(course, lecture)
 
     # courses = getCourses()
     #

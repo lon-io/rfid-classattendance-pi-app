@@ -26,6 +26,8 @@ GPIO.setmode(GPIO.BOARD)
 
 BASE_URL = 'http://192.168.43.200:3000/api/'
 
+continue_reading = True
+
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal, frame):
     global continue_reading
@@ -125,8 +127,9 @@ def readCards(course, lecture):
 
     current = 0
 
+    global continue_reading
     # This loop keeps checking for chips. If one is near it will get the UID and authenticate
-    while True:
+    while continue_reading:
 
         students = []
 
@@ -153,6 +156,7 @@ def readCards(course, lecture):
 
         # If a card is found
         if status == MIFAREReader.MI_OK:
+            print "Card detected"
             lcd.lcd_clear()
             lcd.lcd_string("Card detected:", lcd.LCD_LINE_1)
 
@@ -163,6 +167,9 @@ def readCards(course, lecture):
         if status == MIFAREReader.MI_OK:
 
             uid_ = str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
+
+            # Print UID
+            print "Card read UID: " + uid_
 
             # Print UID
             lcd.lcd_string(uid_, lcd.LCD_LINE_2)
@@ -223,29 +230,23 @@ def createLecture(course):
     return lecture
 
 
-def resetKeypad():
-    keypad.is_back_clicked = False
-    keypad.is_delete_clicked = False
-    keypad.is_ok_clicked = False
-
-
 def readKeypad():
     keypad.current_str = ""
     last_str = ""
     while True:
         if keypad.is_ok_clicked:
-            resetKeypad()
+            keypad.resetKeypad()
             return last_str
         elif keypad.is_back_clicked:
-            resetKeypad()
+            keypad.resetKeypad()
             return False
         elif keypad.is_delete_clicked:
-            resetKeypad()
+            keypad.resetKeypad()
         elif last_str != keypad.current_str:
             last_str = keypad.current_str
             if keypad.should_show:
                 # Todo: Should  check that the string contains only integers
-                clearLcd()
+                lcd.lcd_clear()
                 lcd.lcd_string(last_str, lcd.LCD_LINE_1)
 
 
@@ -261,11 +262,6 @@ def getCourse(current_str):
     else:
         course = response
     return course
-
-
-def clearLcd():
-    lcd.lcd_string("", lcd.LCD_LINE_1)
-    lcd.lcd_string("", lcd.LCD_LINE_2)
 
 
 def main():

@@ -252,17 +252,14 @@ def readKeypad():
 def getCourse(current_str):
     lcd.lcd_clear()
     r = requests.get(BASE_URL + 'coursecode/' + current_str)
-
     response = r.json()
-
     if 'error' in response and response['error']:
-        lcd.lcd_string('No course with ', lcd.LCD_LINE_1)
-        lcd.lcd_string('code: EEE' + current_str, lcd.LCD_LINE_2)
+        lcd.lcd_string('No course:' + ' EEE' + current_str[:-1] , lcd.LCD_LINE_1)
+        lcd.lcd_string(current_str[-1:]+'. Try again', lcd.LCD_LINE_2)
         time.sleep(1)
         return False
     else:
         course = response
-
     return course
 
 

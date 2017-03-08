@@ -118,39 +118,30 @@ def markAttendance(course, lecture, uid):
 
 
 def readCards(course, lecture):
+    keypad.current_str = ""
+    last_str = ""
     lcd.lcd_string("You may now ", lcd.LCD_LINE_1)
     lcd.lcd_string("swipe cards...", lcd.LCD_LINE_2)
-
     time.sleep(1)
-
     lcd.lcd_clear()
-
-    current = 0
-
     global continue_reading
     # This loop keeps checking for chips. If one is near it will get the UID and authenticate
     while continue_reading:
-
+        if keypad.is_ok_clicked:
+            keypad.resetKeypad()
+            return last_str
+        elif keypad.is_back_clicked:
+            keypad.resetKeypad()
+            return False
+        elif last_str != keypad.current_str:
+            last_str = keypad.current_str
+            if keypad.is_delete_clicked:
+                keypad.resetKeypad()
+            if keypad.should_show:
+                # Todo: Should  check that the string contains only integers
+                lcd.lcd_clear()
+                lcd.lcd_string(last_str, lcd.LCD_LINE_1)
         students = []
-
-        # blue_btn = GPIO.input(40)
-        # green_btn = GPIO.input(36)
-        # red_btn = GPIO.input(38)
-        # black_btn = GPIO.input(35)
-
-        # if not blue_btn:
-        #     if current < len(students) -1:
-        #         current += 1
-        #         #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
-        # elif not green_btn:
-        #     if current > 0:
-        #         current -= 1
-        #         #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
-        # elif not red_btn:
-        #     return
-        # elif not black_btn:
-        #     return students[current]
-
         # Scan for cards
         (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
 
@@ -165,21 +156,16 @@ def readCards(course, lecture):
 
         # If we have the UID, continue
         if status == MIFAREReader.MI_OK:
-
             uid_ = str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
 
             # Print UID
             print "Card read UID: " + uid_
-
-            # Print UID
             lcd.lcd_string(uid_, lcd.LCD_LINE_2)
 
             (lecture, student) = markAttendance(course, lecture, uid_)
 
             if student != False:
                 students.append(student['matric_no'])
-
-
 
 def selectCourse(courses):
     current = 0
@@ -240,10 +226,10 @@ def readKeypad():
         elif keypad.is_back_clicked:
             keypad.resetKeypad()
             return False
-        elif keypad.is_delete_clicked:
-            keypad.resetKeypad()
         elif last_str != keypad.current_str:
             last_str = keypad.current_str
+            if keypad.is_delete_clicked:
+                keypad.resetKeypad()
             if keypad.should_show:
                 # Todo: Should  check that the string contains only integers
                 lcd.lcd_clear()
@@ -335,5 +321,7 @@ if __name__ == '__main__':
   finally:
     lcd.lcd_byte(0x01, False)
     lcd.lcd_string("Goodbye!", lcd.LCD_LINE_1)
+    time.sleep(1)
+    lcd.lcd_clear()
     GPIO.cleanup()
 

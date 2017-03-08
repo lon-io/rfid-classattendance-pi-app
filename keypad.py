@@ -32,8 +32,8 @@ class Keypad:
 
         def resetKeypad(self):
             self.is_back_clicked = False
-            self.keypad.is_delete_clicked = False
-            self.keypad.is_ok_clicked = False
+            self.is_delete_clicked = False
+            self.is_ok_clicked = False
 
 
         def printKey(self, key):

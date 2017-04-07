@@ -24,7 +24,7 @@ GPIO.setmode(GPIO.BOARD)
 # GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-BASE_URL = 'http://192.168.43.200:3000/api/'
+BASE_URL = 'http://192.168.43.122:3000/api/'
 
 continue_reading = True
 
@@ -130,7 +130,6 @@ def readCards(course, lecture):
     global continue_reading
     # This loop keeps checking for chips. If one is near it will get the UID and authenticate
     while continue_reading:
-
         students = []
 
         # blue_btn = GPIO.input(40)
@@ -240,15 +239,14 @@ def readKeypad():
         elif keypad.is_back_clicked:
             keypad.resetKeypad()
             return False
-        elif keypad.is_delete_clicked:
-            keypad.resetKeypad()
         elif last_str != keypad.current_str:
             last_str = keypad.current_str
+            if keypad.is_delete_clicked:
+                keypad.resetKeypad()
             if keypad.should_show:
                 # Todo: Should  check that the string contains only integers
                 lcd.lcd_clear()
                 lcd.lcd_string(last_str, lcd.LCD_LINE_1)
-
 
 def getCourse(current_str):
     lcd.lcd_clear()
@@ -335,5 +333,7 @@ if __name__ == '__main__':
   finally:
     lcd.lcd_byte(0x01, False)
     lcd.lcd_string("Goodbye!", lcd.LCD_LINE_1)
+    time.sleep(1)
+    lcd.lcd_clear()
     GPIO.cleanup()
 

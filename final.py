@@ -288,40 +288,40 @@ def main():
         readCards(course, lecture)
 
 
-    # courses = getCourses()
-    #
-    # lcd.lcd_string("Please select a ", lcd.LCD_LINE_1)
-    # lcd.lcd_string("Course", lcd.LCD_LINE_2)
-    #
-    # time.sleep(1)
-    #
-    # course = selectCourse(courses)
-    #
-    # lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
-    # lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
-    #
-    # time.sleep(0.5)
-    #
-    # lecture = createLecture(course)
-    #
-    # lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
-    # lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
-    #
-    # time.sleep(0.5)
-    #
-    # readCards(course, lecture)
+        # courses = getCourses()
+        #
+        # lcd.lcd_string("Please select a ", lcd.LCD_LINE_1)
+        # lcd.lcd_string("Course", lcd.LCD_LINE_2)
+        #
+        # time.sleep(1)
+        #
+        # course = selectCourse(courses)
+        #
+        # lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
+        # lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
+        #
+        # time.sleep(0.5)
+        #
+        # lecture = createLecture(course)
+        #
+        # lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
+        # lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
+        #
+        # time.sleep(0.5)
+        #
+        # readCards(course, lecture)
 
 
 if __name__ == '__main__':
 
-  try:
-    main()
-  except KeyboardInterrupt:
-    pass
-  finally:
-    lcd.lcd_byte(0x01, False)
-    lcd.lcd_string("Goodbye!", lcd.LCD_LINE_1)
-    time.sleep(1)
-    lcd.lcd_clear()
-    GPIO.cleanup()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        lcd.lcd_byte(0x01, False)
+        lcd.lcd_string("Goodbye!", lcd.LCD_LINE_1)
+        time.sleep(1)
+        lcd.lcd_clear()
+        GPIO.cleanup()
 

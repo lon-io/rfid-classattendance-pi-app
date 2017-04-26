@@ -42,10 +42,11 @@ class Keypad:
                         self.is_ok_clicked = True
                 elif key == 'B':
                         self.is_back_clicked = True
+			if len(self.current_str) != 0:
+                                self.current_str = self.current_str[:-1]
+
                 elif key == 'C':
                         self.is_delete_clicked = True
-                        if len(self.current_str) != 0:
-                                self.current_str = self.current_str[:-1]
                 else:
                         self.is_ok_clicked = False
                         self.is_back_clicked = False

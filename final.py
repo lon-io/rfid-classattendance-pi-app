@@ -5,7 +5,7 @@
 import time
 import signal
 from datetime import datetime
-
+import sys
 import RPi.GPIO as GPIO
 import requests
 from lcd import Lcd
@@ -24,7 +24,7 @@ GPIO.setmode(GPIO.BOARD)
 # GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-BASE_URL = 'http://192.168.43.122:3000/api/'
+BASE_URL = 'http://192.168.0.3:3000/api/'
 
 continue_reading = True
 
@@ -34,7 +34,7 @@ def end_read(signal, frame):
     print "Ctrl+C captured, ending read."
     continue_reading = False
     GPIO.cleanup()
-
+    sys.exit()
 
 # Hook the SIGINT
 signal.signal(signal.SIGINT, end_read)
@@ -118,38 +118,25 @@ def markAttendance(course, lecture, uid):
 
 
 def readCards(course, lecture):
+    keypad.current_str = ""
+    last_str = ""
     lcd.lcd_string("You may now ", lcd.LCD_LINE_1)
     lcd.lcd_string("swipe cards...", lcd.LCD_LINE_2)
-
     time.sleep(1)
-
     lcd.lcd_clear()
-
-    current = 0
-
     global continue_reading
     # This loop keeps checking for chips. If one is near it will get the UID and authenticate
     while continue_reading:
+        if keypad.is_ok_clicked:
+            keypad.resetKeypad()
+            return last_str
+        elif keypad.is_delete_clicked:
+            keypad.resetKeypad()
+            return 'delete'
+        elif keypad.is_back_clicked:
+            keypad.resetKeypad()
+	    return 'back'
         students = []
-
-        # blue_btn = GPIO.input(40)
-        # green_btn = GPIO.input(36)
-        # red_btn = GPIO.input(38)
-        # black_btn = GPIO.input(35)
-
-        # if not blue_btn:
-        #     if current < len(students) -1:
-        #         current += 1
-        #         #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
-        # elif not green_btn:
-        #     if current > 0:
-        #         current -= 1
-        #         #lcd.lcd_string(students[current], lcd.LCD_LINE_1)
-        # elif not red_btn:
-        #     return
-        # elif not black_btn:
-        #     return students[current]
-
         # Scan for cards
         (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
 
@@ -164,21 +151,16 @@ def readCards(course, lecture):
 
         # If we have the UID, continue
         if status == MIFAREReader.MI_OK:
-
             uid_ = str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
 
             # Print UID
             print "Card read UID: " + uid_
-
-            # Print UID
             lcd.lcd_string(uid_, lcd.LCD_LINE_2)
 
             (lecture, student) = markAttendance(course, lecture, uid_)
 
             if student != False:
                 students.append(student['matric_no'])
-
-
 
 def selectCourse(courses):
     current = 0
@@ -236,12 +218,12 @@ def readKeypad():
         if keypad.is_ok_clicked:
             keypad.resetKeypad()
             return last_str
-        elif keypad.is_back_clicked:
+        elif keypad.is_delete_clicked:
             keypad.resetKeypad()
             return False
         elif last_str != keypad.current_str:
             last_str = keypad.current_str
-            if keypad.is_delete_clicked:
+            if keypad.is_back_clicked:
                 keypad.resetKeypad()
             if keypad.should_show:
                 # Todo: Should  check that the string contains only integers
@@ -250,8 +232,33 @@ def readKeypad():
 
 def getCourse(current_str):
     lcd.lcd_clear()
-    r = requests.get(BASE_URL + 'coursecode/' + current_str)
-    response = r.json()
+
+    try:
+        r = requests.get(BASE_URL + 'coursecode/' + current_str)
+        response = r.json()
+    except:
+        lcd.lcd_string('Network error', lcd.LCD_LINE_1)
+        lcd.lcd_string('Retrying...', lcd.LCD_LINE_2)
+        while True:
+            try:
+                r = requests.get(BASE_URL + 'coursecode/' + current_str)
+                response = r.json()
+            except:
+                pass
+            if keypad.is_back_clicked:
+                keypad.resetKeypad()
+                lcd.lcd_clear()
+                lcd.lcd_string('Back', lcd.LCD_LINE_1)
+                time.sleep(1)
+		lcd.lcd_string('Try again', lcd.LCD_LINE_1)
+                return False
+            elif keypad.is_delete_clicked:
+                lcd.lcd_clear()
+                lcd.lcd_string('Cancelled', lcd.LCD_LINE_1)
+                time.sleep(1)
+                keypad.resetKeypad()
+                return 'cancel'    
+
     if 'error' in response and response['error']:
         lcd.lcd_string('No course:' + ' EEE' + current_str[:-1] , lcd.LCD_LINE_1)
         lcd.lcd_string(current_str[-1:]+'. Try again', lcd.LCD_LINE_2)
@@ -277,7 +284,10 @@ def main():
     else:
         course = getCourse(course_code)
 
-        while not course:
+	if course == 'cancel':
+            return
+        
+	while not course:
             course_code = readKeypad()
             if not course_code:
                 lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
@@ -297,7 +307,52 @@ def main():
 
         time.sleep(0.5)
 
-        readCards(course, lecture)
+        read_cards = readCards(course, lecture)
+	if read_cards == 'delete':
+	    return
+	elif read_cards == 'back':
+	    ###########
+	    lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
+    	    lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
+            
+   	    keypad.should_show = True
+    	    course_code = readKeypad()
+    	    if not course_code:
+                lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
+                lcd.lcd_string("", lcd.LCD_LINE_2)
+    	    else:
+        	course = getCourse(course_code)
+
+            if course == 'cancel':
+                return
+
+            while not course:
+                course_code = readKeypad()
+                if not course_code:
+                    lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
+                    lcd.lcd_string("", lcd.LCD_LINE_2)
+                    return
+                course = getCourse(keypad.current_str)
+
+            lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
+            lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
+
+            time.sleep(1.0)
+
+            lecture = createLecture(course)
+
+            lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
+            lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
+
+	    
+     	    time.sleep(0.5)
+
+            read_cards = readCards(course, lecture)
+            if read_cards == 'delete':
+                return
+            elif read_cards == 'back':
+		return
+	    
 
 
     # courses = getCourses()
@@ -330,9 +385,7 @@ if __name__ == '__main__':
     main()
   except KeyboardInterrupt:
     pass
-  finally:
-    lcd.lcd_byte(0x01, False)
-    lcd.lcd_string("Goodbye!", lcd.LCD_LINE_1)
+  finally:    
     time.sleep(1)
     lcd.lcd_clear()
     GPIO.cleanup()

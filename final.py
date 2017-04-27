@@ -271,17 +271,18 @@ def getCourse(current_str):
 
 
 def main():
-    lcd.lcd_string("Welcome", lcd.LCD_LINE_1)
+    lcd.lcd_string('Welcome', lcd.LCD_LINE_1)
+    lcd.lcd_string('', lcd.LCD_LINE_2)
     time.sleep(2)  # 2 second delay
 
-    lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
-    lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
+    lcd.lcd_string('Enter a Course', lcd.LCD_LINE_1)
+    lcd.lcd_string('code (e.g. 503)', lcd.LCD_LINE_2)
 
     keypad.should_show = True
     course_code = readKeypad()
     if not course_code:
-        lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
-        lcd.lcd_string("", lcd.LCD_LINE_2)
+        lcd.lcd_string('Cancelled', lcd.LCD_LINE_1)
+        lcd.lcd_string('', lcd.LCD_LINE_2)
     else:
         course = getCourse(course_code)
 
@@ -296,14 +297,14 @@ def main():
                 return
             course = getCourse(keypad.current_str)
 
-        lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
+        lcd.lcd_string('Course Selected:', lcd.LCD_LINE_1)
         lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
 
         time.sleep(1.0)
 
         lecture = createLecture(course)
 
-        lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
+        lcd.lcd_string('Lecture Created:', lcd.LCD_LINE_1)
         lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
 
         time.sleep(0.5)
@@ -313,14 +314,14 @@ def main():
             return
         elif read_cards == 'back':
             ###########
-            lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
-            lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
+            lcd.lcd_string('Enter a Course', lcd.LCD_LINE_1)
+            lcd.lcd_string('code (e.g. 503)', lcd.LCD_LINE_2)
 
             keypad.should_show = True
             course_code = readKeypad()
             if not course_code:
-                lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
-                lcd.lcd_string("", lcd.LCD_LINE_2)
+                lcd.lcd_string('Cancelled', lcd.LCD_LINE_1)
+                lcd.lcd_string('', lcd.LCD_LINE_2)
             else:
                 course = getCourse(course_code)
 

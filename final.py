@@ -12,6 +12,7 @@ from lcd import Lcd
 from MFRC522 import MFRC522
 from keypad import Keypad
 import json
+import urllib
 
 
 # Timing constants
@@ -271,7 +272,7 @@ def getCourse(current_str):
 
 def main():
     lcd.lcd_string("Welcome", lcd.LCD_LINE_1)
-    time.sleep(1)  # 3 second delay
+    time.sleep(2)  # 2 second delay
 
     lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
     lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
@@ -382,6 +383,19 @@ def main():
 if __name__ == '__main__':
 
     try:
+        timeout = 300
+        uptime = 0
+        delay = 5
+        while (urllib.urlopen(BASE_URL + 'test').getcode() != 200):
+            lcd.lcd_string('Initializing', lcd.LCD_LINE_1)
+            lcd.lcd_string('Local Network...', lcd.LCD_LINE_2)
+            time.sleep(delay)  # 3 second delay
+            uptime+=delay
+            if (uptime >= timeout):
+                lcd.lcd_string('Timedout waiting', lcd.LCD_LINE_1)
+                lcd.lcd_string('4 network -> BYE', lcd.LCD_LINE_2)
+                time.sleep(delay)
+                sys.exit()
         main()
     except KeyboardInterrupt:
         pass

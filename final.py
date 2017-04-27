@@ -12,7 +12,7 @@ from lcd import Lcd
 from MFRC522 import MFRC522
 from keypad import Keypad
 import json
-import urllib
+import urllib2
 
 
 # Timing constants
@@ -386,21 +386,32 @@ if __name__ == '__main__':
         timeout = 300
         uptime = 0
         delay = 5
-        while (urllib.urlopen(BASE_URL + 'test').getcode() != 200):
+
+	try: 
+	    code = urllib2.urlopen(BASE_URL + 'test').getcode()
+	except urllib2.URLError, err:
+	    code = 0
+
+        while (code != 200):
             lcd.lcd_string('Initializing', lcd.LCD_LINE_1)
             lcd.lcd_string('Local Network...', lcd.LCD_LINE_2)
             time.sleep(delay)  # 3 second delay
             uptime+=delay
+	    try:
+                code = urllib2.urlopen(BASE_URL + 'test').getcode()
+            except urllib2.URLError, err:
+                pass
             if (uptime >= timeout):
                 lcd.lcd_string('Timedout waiting', lcd.LCD_LINE_1)
                 lcd.lcd_string('4 network -> BYE', lcd.LCD_LINE_2)
                 time.sleep(3)
                 sys.exit()
+
         lcd.lcd_string('Connected...', lcd.LCD_LINE_1)
-        lcd.lcd_string('', lcd.LCD_LINE_2)
+	lcd.lcd_string('After ' + uptime + 'secs', lcd.LCD_LINE_2)
         time.sleep(2)
         main()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt, err:
         pass
     finally:
         time.sleep(1)

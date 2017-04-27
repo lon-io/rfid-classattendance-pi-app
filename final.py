@@ -394,8 +394,10 @@ if __name__ == '__main__':
             if (uptime >= timeout):
                 lcd.lcd_string('Timedout waiting', lcd.LCD_LINE_1)
                 lcd.lcd_string('4 network -> BYE', lcd.LCD_LINE_2)
-                time.sleep(delay)
+                time.sleep(3)
                 sys.exit()
+        lcd.lcd_string('Connected...', lcd.LCD_LINE_1)
+        lcd.lcd_string('', lcd.LCD_LINE_2)
         main()
     except KeyboardInterrupt:
         pass

@@ -398,6 +398,7 @@ if __name__ == '__main__':
                 sys.exit()
         lcd.lcd_string('Connected...', lcd.LCD_LINE_1)
         lcd.lcd_string('', lcd.LCD_LINE_2)
+        time.sleep(2)
         main()
     except KeyboardInterrupt:
         pass

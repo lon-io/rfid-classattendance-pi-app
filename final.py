@@ -24,7 +24,7 @@ GPIO.setmode(GPIO.BOARD)
 # GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-BASE_URL = 'http://192.168.0.3:3000/api/'
+BASE_URL = 'http://127.0.0.1:3000/api/'
 
 continue_reading = True
 

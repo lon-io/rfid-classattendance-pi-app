@@ -401,14 +401,14 @@ if __name__ == '__main__':
                 code = urllib2.urlopen(BASE_URL + 'test').getcode()
             except urllib2.URLError, err:
                 pass
-            if (uptime >= timeout):
+            if uptime >= timeout:
                 lcd.lcd_string('Timedout waiting', lcd.LCD_LINE_1)
                 lcd.lcd_string('4 network -> BYE', lcd.LCD_LINE_2)
                 time.sleep(3)
                 sys.exit()
 
         lcd.lcd_string('Connected...', lcd.LCD_LINE_1)
-        lcd.lcd_string('After ' + uptime + 'secs', lcd.LCD_LINE_2)
+        lcd.lcd_string('After %d' % (uptime,) + 'secs', lcd.LCD_LINE_2)
         time.sleep(2)
         main()
     except KeyboardInterrupt, err:

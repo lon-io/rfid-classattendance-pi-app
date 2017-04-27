@@ -387,17 +387,17 @@ if __name__ == '__main__':
         uptime = 0
         delay = 5
 
-	try: 
-	    code = urllib2.urlopen(BASE_URL + 'test').getcode()
-	except urllib2.URLError, err:
-	    code = 0
+        try:
+            code = urllib2.urlopen(BASE_URL + 'test').getcode()
+        except urllib2.URLError, err:
+            code = 0
 
         while (code != 200):
             lcd.lcd_string('Initializing', lcd.LCD_LINE_1)
             lcd.lcd_string('Local Network...', lcd.LCD_LINE_2)
             time.sleep(delay)  # 3 second delay
             uptime+=delay
-	    try:
+            try:
                 code = urllib2.urlopen(BASE_URL + 'test').getcode()
             except urllib2.URLError, err:
                 pass
@@ -408,7 +408,7 @@ if __name__ == '__main__':
                 sys.exit()
 
         lcd.lcd_string('Connected...', lcd.LCD_LINE_1)
-	lcd.lcd_string('After ' + uptime + 'secs', lcd.LCD_LINE_2)
+        lcd.lcd_string('After ' + uptime + 'secs', lcd.LCD_LINE_2)
         time.sleep(2)
         main()
     except KeyboardInterrupt, err:

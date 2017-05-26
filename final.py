@@ -271,18 +271,17 @@ def getCourse(current_str):
 
 
 def main():
-    lcd.lcd_string('Welcome', lcd.LCD_LINE_1)
-    lcd.lcd_string('', lcd.LCD_LINE_2)
+    lcd.lcd_string("Welcome", lcd.LCD_LINE_1)
     time.sleep(2)  # 2 second delay
 
-    lcd.lcd_string('Enter a Course', lcd.LCD_LINE_1)
-    lcd.lcd_string('code (e.g. 503)', lcd.LCD_LINE_2)
+    lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
+    lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
 
     keypad.should_show = True
     course_code = readKeypad()
     if not course_code:
-        lcd.lcd_string('Cancelled', lcd.LCD_LINE_1)
-        lcd.lcd_string('', lcd.LCD_LINE_2)
+        lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
+        lcd.lcd_string("", lcd.LCD_LINE_2)
     else:
         course = getCourse(course_code)
 
@@ -297,14 +296,14 @@ def main():
                 return
             course = getCourse(keypad.current_str)
 
-        lcd.lcd_string('Course Selected:', lcd.LCD_LINE_1)
+        lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
         lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
 
         time.sleep(1.0)
 
         lecture = createLecture(course)
 
-        lcd.lcd_string('Lecture Created:', lcd.LCD_LINE_1)
+        lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
         lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
 
         time.sleep(0.5)
@@ -314,14 +313,14 @@ def main():
             return
         elif read_cards == 'back':
             ###########
-            lcd.lcd_string('Enter a Course', lcd.LCD_LINE_1)
-            lcd.lcd_string('code (e.g. 503)', lcd.LCD_LINE_2)
+            lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
+            lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
 
             keypad.should_show = True
             course_code = readKeypad()
             if not course_code:
-                lcd.lcd_string('Cancelled', lcd.LCD_LINE_1)
-                lcd.lcd_string('', lcd.LCD_LINE_2)
+                lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
+                lcd.lcd_string("", lcd.LCD_LINE_2)
             else:
                 course = getCourse(course_code)
 
@@ -404,18 +403,4 @@ if __name__ == '__main__':
                 pass
             if uptime >= timeout:
                 lcd.lcd_string('Timedout waiting', lcd.LCD_LINE_1)
-                lcd.lcd_string('4 network -> BYE', lcd.LCD_LINE_2)
-                time.sleep(3)
-                sys.exit()
-
-        lcd.lcd_string('Connected...', lcd.LCD_LINE_1)
-        lcd.lcd_string('After %d' % (uptime,) + 'secs', lcd.LCD_LINE_2)
-        time.sleep(2)
-        main()
-    except KeyboardInterrupt, err:
-        pass
-    finally:
-        time.sleep(1)
-        lcd.lcd_clear()
-        GPIO.cleanup()
-
+        

@@ -6,6 +6,7 @@ import time
 import signal
 from datetime import datetime
 import sys
+import openpyxl
 import RPi.GPIO as GPIO
 import requests
 from lcd import Lcd
@@ -79,6 +80,13 @@ def markAttendance(course, lecture, uid):
     if 'error' in response and response['error']:
         lcd.lcd_string('No user with ID:', lcd.LCD_LINE_1)
         lcd.lcd_string(uid, lcd.LCD_LINE_2)
+        
+        # reset the display
+            lcd.lcd_clear()
+            
+        # prompt the user to swipe again
+        lcd.lcd_string('Swipe your card', lcd.LCD_LINE_1)
+            
         return lecture, False
     else:
         student = response
@@ -101,16 +109,40 @@ def markAttendance(course, lecture, uid):
             lecture['attendance'] = attendance_
             lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_1)
             lcd.lcd_string("Already Marked", lcd.LCD_LINE_2)
+            
+            # reset the display
+            lcd.lcd_clear()
+            
+            # prompt the user to swipe again
+            lcd.lcd_string('Swipe your card', lcd.LCD_LINE_1)
         else:
             lecture = response
             lcd.lcd_string(student['matric_no'], lcd.LCD_LINE_1)
             lcd.lcd_string("Marked", lcd.LCD_LINE_2)
+            
+            # reset the display
+            lcd.lcd_clear()
+            
+            # prompt the user to swipe again
+            lcd.lcd_string('Swipe your card', lcd.LCD_LINE_1)
+            
+            # open lecture file
+            lectureFile = openpyxl.load_workbook(fileName)
+            # update lecture file
+            lectureFile.active.append(student['matric_no'])
+            lectureFile.save(fileName)
 
         return lecture, student
 
     else:
         lcd.lcd_string(student['matric_no'] + ' not', lcd.LCD_LINE_1)
         lcd.lcd_string('registered', lcd.LCD_LINE_2)
+        
+        # reset the display
+            lcd.lcd_clear()
+            
+        # prompt the user to swipe again
+        lcd.lcd_string('Swipe your card', lcd.LCD_LINE_1)
 
         return lecture, student
 
@@ -121,7 +153,13 @@ def readCards(course, lecture):
     lcd.lcd_string("You may now ", lcd.LCD_LINE_1)
     lcd.lcd_string("swipe cards...", lcd.LCD_LINE_2)
     time.sleep(1)
+    
+    # reset the display
     lcd.lcd_clear()
+            
+    # prompt the user to swipe again
+    lcd.lcd_string('Swipe your card', lcd.LCD_LINE_1)
+    
     global continue_reading
     # This loop keeps checking for chips. If one is near it will get the UID and authenticate
     while continue_reading:
@@ -250,12 +288,6 @@ def getCourse(current_str):
                 time.sleep(1)
                 lcd.lcd_string('Try again', lcd.LCD_LINE_1)
                 return False
-            elif keypad.is_delete_clicked:
-                lcd.lcd_clear()
-                lcd.lcd_string('Cancelled', lcd.LCD_LINE_1)
-                time.sleep(1)
-                keypad.resetKeypad()
-                return 'cancel'
 
     if 'error' in response and response['error']:
         lcd.lcd_string('No course:' + ' EEE' + current_str[:-1] , lcd.LCD_LINE_1)
@@ -265,139 +297,112 @@ def getCourse(current_str):
     else:
         course = response
     return course
-
-
+    
 def main():
-    lcd.lcd_string("Welcome", lcd.LCD_LINE_1)
-    time.sleep(2)  # 2 second delay
-
-    lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
-    lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
-
+    # greet the user
+    lcd.lcd_string('Hello!', lcd.LCD_LINE_1)
+    
+    # make the message stay for a while
+    time.sleep(2)
+    
+    # clear the lcd
+    lcd.lcd_clear()
+    
+    # inform the user that the domain of functionality is EEE courses
+    lcd.lcd_string('EEE courses', lcd.LCD_LINE_1)
+    lcd.lcd_string('only!', lcd.LCD_LINE_2)
+    
+    # ensure keypad shows
     keypad.should_show = True
-    course_code = readKeypad()
-    if not course_code:
-        lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
-        lcd.lcd_string("", lcd.LCD_LINE_2)
-    else:
-        course = getCourse(course_code)
-
-        if course == 'cancel':
-            return
-
-        while not course:
-            course_code = readKeypad()
-            if not course_code:
-                lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
-                lcd.lcd_string("", lcd.LCD_LINE_2)
-                return
-            course = getCourse(keypad.current_str)
-
-        lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
-        lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
-
-        time.sleep(1.0)
-
-        lecture = createLecture(course)
-
-        lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
-        lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
-
-        time.sleep(0.5)
-
-        read_cards = readCards(course, lecture)
-        if read_cards == 'delete':
-            return
-        elif read_cards == 'back':
-            ###########
-            lcd.lcd_string("Enter a Course", lcd.LCD_LINE_1)
-            lcd.lcd_string("code (e.g. 503)", lcd.LCD_LINE_2)
-
-            keypad.should_show = True
-            course_code = readKeypad()
-            if not course_code:
-                lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
-                lcd.lcd_string("", lcd.LCD_LINE_2)
-            else:
-                course = getCourse(course_code)
-
-            if course == 'cancel':
-                return
-
-            while not course:
-                course_code = readKeypad()
-                if not course_code:
-                    lcd.lcd_string("Cancelled", lcd.LCD_LINE_1)
-                    lcd.lcd_string("", lcd.LCD_LINE_2)
-                    return
-                course = getCourse(keypad.current_str)
-
+    
+    # make the message stay briefly
+    time.sleeep(1)
+    
+    # clear the lcd
+    lcd.lcd_clear()
+    
+    # initialize variable to be used in while loop conditional
+    password = ''
+    
+    while password != '1234':
+        # request for password from user
+        lcd.lcd_string('Password?', lcd.LCD_LINE_1)
+        # hide user's input
+        keypad.should_show = False
+        # read from keypad
+        password = readKeypad()
+        # reset the keypad
+        keypad.resetKeypad()
+        
+        # verify if password is valid
+        if password == '1234':
+            # grant access
+            lcd.lcd_string('Access granted!', lcd.LCD_LINE_1)
+            
+            # make the message stay for a while
+            time.sleep(1)
+            
+            # clear the lcd
+            lcd.lcd_clear()
+        else:
+            # deny access
+            lcd.lcd_string('Access denied!', lcd.LCD_LINE_1)
+            
+            # make the message stay for a while
+            time.sleep(1)
+            
+            # clear the lcd
+            lcd.lcd_clear()
+            
+    # display user's input
+    keypad.should_show = True
+    
+    # initialize variable that'll be used in while loop conditional
+    course = ''
+    while not course:
+        # ask user for course digits
+        lcd.lcd_string('Course Digits?', lcd.LCD_LINE_1)
+        lcd.lcd_string('EEE 204 -> 204', lcd.LCD_LINE_2)
+        # read user's input
+        course_digits = readKeypad()
+        # reset the keypad
+        keypad.resetKeypad()
+        
+        # verify is course digits will fit into infrastructure
+        course = getCourse(course_digits)
+        if course:
+            # notify user of course_digits' validity
             lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
             lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
-
-            time.sleep(1.0)
-
-            lecture = createLecture(course)
-
-            lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
-            lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
-
-
-            time.sleep(0.5)
-
-            read_cards = readCards(course, lecture)
-            if read_cards == 'delete':
-                return
-            elif read_cards == 'back':
-                return
-
-
-
-                # courses = getCourses()
-                #
-                # lcd.lcd_string("Please select a ", lcd.LCD_LINE_1)
-                # lcd.lcd_string("Course", lcd.LCD_LINE_2)
-                #
-                # time.sleep(1)
-                #
-                # course = selectCourse(courses)
-                #
-                # lcd.lcd_string("Course Selected:", lcd.LCD_LINE_1)
-                # lcd.lcd_string(course['code'], lcd.LCD_LINE_2)
-                #
-                # time.sleep(0.5)
-                #
-                # lecture = createLecture(course)
-                #
-                # lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
-                # lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
-                #
-                # time.sleep(0.5)
-                #
-                # readCards(course, lecture)
-
-
-if __name__ == '__main__':
-
-    try:
-        timeout = 300
-        uptime = 0
-        delay = 5
-
-        try:
-            code = urllib2.urlopen(BASE_URL + 'test').getcode()
-        except urllib2.URLError, err:
-            code = 0
-
-        while (code != 200):
-            lcd.lcd_string('Initializing', lcd.LCD_LINE_1)
-            lcd.lcd_string('Local Network...', lcd.LCD_LINE_2)
-            time.sleep(delay)  # 3 second delay
-            uptime+=delay
-            try:
-                code = urllib2.urlopen(BASE_URL + 'test').getcode()
-            except urllib2.URLError, err:
-                pass
-            if uptime >= timeout:
-                lcd.lcd_string('Timedout waiting', lcd.LCD_LINE_1)
-        
+            
+            # give a time delay to make message readable
+            time.sleep(1)
+            
+            # clear the lcd
+            lcd.lcd_clear()
+    
+    # create lecture instance
+    lecture = createLecture(course)
+    # create a file name for lecture
+    global fileName
+    fileName = 'EEE_%d_%2d%.2d%4d' % (course_digits, datetime.date.today().day,
+                                      datetime.date.today().month,
+                                      datetime.date.today().year)
+    # create a file for the lecture
+    lectureFile = openpyxl.Workbook()
+    lectureFile.save(fileName)
+    # notify user that a lecture instance has been created
+    lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)
+    lcd.lcd_string(lecture['topic'], lcd.LCD_LINE_2)
+    
+    # add a little time delay to make message readable
+    time.sleep(1)
+    #clear the lcd
+    lcd.lcd_clear()
+    
+    # begin attendance session
+    readCards(course, lecture)
+    
+    # inform user that the system is ready to shut down
+    lcd.lcd_string('Ready to', lcd.LCD_LINE_1)
+    lcd.lcd_string('shut down!', lcd.LCD_LINE_2)

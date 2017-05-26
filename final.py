@@ -20,10 +20,7 @@ DELAY = 0.0005
 
 GPIO.setmode(GPIO.BOARD)
 
-# GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-# GPIO.setup(36, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-# GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-# GPIO.setup(35, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 BASE_URL = 'http://127.0.0.1:3000/api/'
 

@@ -406,3 +406,27 @@ def main():
     # inform user that the system is ready to shut down
     lcd.lcd_string('Ready to', lcd.LCD_LINE_1)
     lcd.lcd_string('shut down!', lcd.LCD_LINE_2)
+    
+if __name__ == '__main__':
+-
+-    try:
+-        timeout = 300
+-        uptime = 0
+-        delay = 5
+-
+-        try:
+-            code = urllib2.urlopen(BASE_URL + 'test').getcode()
+-        except urllib2.URLError, err:
+-            code = 0
+-
+-        while (code != 200):
+-            lcd.lcd_string('Initializing', lcd.LCD_LINE_1)
+-            lcd.lcd_string('Local Network...', lcd.LCD_LINE_2)
+-            time.sleep(delay)  # 3 second delay
+-            uptime+=delay
+-            try:
+-                code = urllib2.urlopen(BASE_URL + 'test').getcode()
+-            except urllib2.URLError, err:
+-                pass
+-            if uptime >= timeout:
+-                lcd.lcd_string('Timedout waiting', lcd.LCD_LINE_1)

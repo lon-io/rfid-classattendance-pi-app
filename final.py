@@ -129,7 +129,7 @@ def markAttendance(course, lecture, uid):
             # open lecture file
             lectureFile = openpyxl.load_workbook(fileName)
             # update lecture file
-            lectureFile.active.append(student['matric_no'])
+            lectureFile.active.append([student['matric_no'], 'Present'])
             lectureFile.save(fileName)
 
         return lecture, student
@@ -389,7 +389,13 @@ def main():
                                       datetime.date.today().month,
                                       datetime.date.today().year)
     # create a file for the lecture
-    lectureFile = openpyxl.Workbook()
+    try:
+        lectureFile = openpyxl.load_workbook(filename)
+    except:
+        lectureFile = openpyxl.Workbook()
+    
+    # set sheet table headers
+    lectureFile.active.append(['Matric Number', 'Attendance'])
     lectureFile.save(fileName)
     # notify user that a lecture instance has been created
     lcd.lcd_string("Lecture Created:", lcd.LCD_LINE_1)

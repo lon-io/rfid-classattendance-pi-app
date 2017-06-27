@@ -82,7 +82,7 @@ def markAttendance(course, lecture, uid):
         lcd.lcd_string(uid, lcd.LCD_LINE_2)
         
         # reset the display
-            lcd.lcd_clear()
+        lcd.lcd_clear()
             
         # prompt the user to swipe again
         lcd.lcd_string('Swipe your card', lcd.LCD_LINE_1)
@@ -139,7 +139,7 @@ def markAttendance(course, lecture, uid):
         lcd.lcd_string('registered', lcd.LCD_LINE_2)
         
         # reset the display
-            lcd.lcd_clear()
+        lcd.lcd_clear()
             
         # prompt the user to swipe again
         lcd.lcd_string('Swipe your card', lcd.LCD_LINE_1)
@@ -390,7 +390,7 @@ def main():
                                       datetime.date.today().year)
     # create a file for the lecture
     try:
-        lectureFile = openpyxl.load_workbook(filename)
+        lectureFile = openpyxl.load_workbook(fileName)
     except:
         lectureFile = openpyxl.Workbook()
     
@@ -414,25 +414,25 @@ def main():
     lcd.lcd_string('shut down!', lcd.LCD_LINE_2)
     
 if __name__ == '__main__':
--
--    try:
--        timeout = 300
--        uptime = 0
--        delay = 5
--
--        try:
--            code = urllib2.urlopen(BASE_URL + 'test').getcode()
--        except urllib2.URLError, err:
--            code = 0
--
--        while (code != 200):
--            lcd.lcd_string('Initializing', lcd.LCD_LINE_1)
--            lcd.lcd_string('Local Network...', lcd.LCD_LINE_2)
--            time.sleep(delay)  # 3 second delay
--            uptime+=delay
--            try:
--                code = urllib2.urlopen(BASE_URL + 'test').getcode()
--            except urllib2.URLError, err:
--                pass
--            if uptime >= timeout:
--                lcd.lcd_string('Timedout waiting', lcd.LCD_LINE_1)
+    try:
+        timeout = 300
+        uptime = 0
+        delay = 5
+        
+        try:
+            code = urllib2.urlopen(BASE_URL + 'test').getcode()
+        except urllib2.URLError, err:
+            code = 0
+
+        while (code != 200):
+            lcd.lcd_string('Initializing', lcd.LCD_LINE_1)
+            lcd.lcd_string('Local Network...', lcd.LCD_LINE_2)
+            time.sleep(delay)  # 3 second delay
+            uptime+=delay
+            try:
+                code = urllib2.urlopen(BASE_URL + 'test').getcode()
+            except urllib2.URLError, err:
+                pass
+            if uptime >= timeout:
+                lcd.lcd_string('Timedout waiting', lcd.LCD_LINE_1)
+    except: pass
